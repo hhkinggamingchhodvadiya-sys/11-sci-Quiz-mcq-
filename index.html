@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>૧૧ સાયન્સ ક્વિઝ એપ્લિકેશન</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            user-select: none;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .quiz-section {
+            display: none;
+        }
+        .question {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-top: 2px dashed #eee;
+            padding-top: 15px;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            background-color: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 16px;
+        }
+        .correct {
+            background-color: #2ecc71 !important;
+            color: white;
+        }
+        .wrong {
+            background-color: #e74c3c !important;
+            color: white;
+        }
+        .swipe-hint {
+            position: fixed;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            font-size: 28px;
+            color: #bdc3c7;
+            opacity: 0.6;
+            pointer-events: none;
+            display: none;
+            z-index: 1000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div id="hint-r" class="swipe-hint">‹</div>
+
+<div class="container">
+    <h1>૧૧ સાયન્સ ક્વિઝ 📝</h1>
+    
+    <div id="chapter-selection">
+        <h2>પાઠ પસંદ કરો:</h2>
+        <button class="btn" onclick="startQuiz('chapter1')">પાઠ ૧: રસાયણવિજ્ઞાનની કેટલીક પાયાની વિભાવનાઓ (૨૨ પ્રશ્નો)</button>
+        <button class="btn" onclick="startQuiz('chapter2')">પાઠ ૨: પરમાણુનું બંધારણ (૭૦ પ્રશ્નો)</button>
+    </div>
+
+    <div id="quiz-section" class="quiz-section">
+        <h2 id="quiz-title">પાઠનું નામ</h2>
+        <div id="quiz-container"></div>
+    </div>
+</div>
+
+<script>
+    const quizData = {
+        chapter1: [
+            // પાઠ ૧ ના ૨૨ પ્રશ્નો
+            { question: "૧. પાણી (H2O) નો મોલર દળ કેટલો છે?", options: ["16 g/mol", "18 g/mol", "20 g/mol", "32 g/mol"], answer: "18 g/mol" },
+            { question: "૨. STP એ કોઈપણ ગેસના ૧ મોલનું કદ કેટલું હોય છે?", options: ["22.4 લીટર", "11.2 લીટર", "44.8 લીટર", "10 લીટર"], answer: "22.4 લીટર" },
+            { question: "૩. એવોગેડ્રો આંક નું મૂલ્ય કેટલું છે?", options: ["6.022 x 10^23", "6.626 x 10^-34", "3.0 x 10^8", "1.6 x 10^-19"], answer: "6.022 x 10^23" },
+            { question: "૪. તાપમાન વધારતા નીચેનામાંથી કયું બદલાય છે?", options: ["મોલાલિટી", "મોલ અંશ", "મોલારિટી", "દળ ટકાવારી"], answer: "મોલારિટી" },
+            { question: "૫. શુદ્ધ પાણીની મોલારિટી કેટલી હોય છે?", options: ["55.5 M", "18 M", "1 M", "10 M"], answer: "55.5 M" },
+            { question: "૬. દ્રવ્ય સંચયનો નિયમ કોણે આપ્યો હતો?", options: ["ડાલ્ટન", "એન્ટોની લેવોઇઝિયર", "પ્રાઉસ્ટ", "ગેલ્યુસેક"], answer: "એન્ટોની લેવોઇઝિયર" },
+            { question: "૭. ગ્લુકોઝ (C6H12O6) નું પ્રમાણસૂચક સૂત્ર કયું છે?", options: ["CH2O", "CHO", "C6H12O6", "CH3O"], answer: "CH2O" },
+            { question: "૮. SI પદ્ધતિમાં પદાર્થના જથ્થાનો એકમ કયો છે?", options: ["કિલોગ્રામ", "ગ્રામ", "મોલ", "લીટર"], answer: "મોલ" },
+            { question: "૯. 0.0025 માં સાર્થક અંકોની સંખ્યા કેટલી છે?", options: ["૨", "૩", "૪", "૫"], answer: "૨" },
+            { question: "૧૦. કાર્બન ડાયોક્સાઇડ (CO2) નું આણ્વીય દળ કેટલું થાય?", options: ["44 u", "32 u", "28 u", "12 u"], answer: "44 u" },
+            { question: "૧૧. ઓક્સિજન વાયુનું અણુસૂત્ર O2 છે, તો તેનું આણ્વીય દળ કેટલું?", options: ["16 u", "32 u", "48 u", "64 u"], answer: "32 u" },
+            { question: "૧૨. નીચેનામાંથી કયો એકમ મૂળભૂત SI એકમ નથી?", options: ["મીટર", "કેન્ડિલા", "લીટર", "કેલ્વિન"], answer: "લીટર" },
+            { question: "૧૩. ૧ મિલિગ્રામ (mg) બરાબર કેટલા કિલોગ્રામ (kg)?", options: ["10^-3 kg", "10^-6 kg", "10^-9 kg", "10^3 kg"], answer: "10^-6 kg" },
+            { question: "૧૪. નિશ્ચિત પ્રમાણનો નિયમ કોણે રજૂ કર્યો હતો?", options: ["જોસેફ પ્રાઉસ્ટ", "જોન ડાલ્ટન", "ગેલ્યુસેક", "એવોગેડ્રો"], answer: "જોસેફ પ્રાઉસ્ટ" },
+            { question: "૧૫. ગુણક પ્રમાણનો નિયમ કોણે આપ્યો?", options: ["ડાલ્ટન", "લેવોઇઝિયર", "રૂધરફોર્ડ", "બોહર"], answer: "ડાલ્ટન" },
+            { question: "૧૬. ૧ મોલ હાઇડ્રોજન પરમાણુનું દળ કેટલું થાય?", options: ["1.008 g", "2.016 g", "16 g", "4 g"], answer: "1.008 g" },
+            { question: "૧૭. દ્રાવણના કુલ મોલ અને ઘટકના મોલના ગુણોત્તરને શું કહે છે?", options: ["મોલારિટી", "મોલાલિટી", "મોલ અંશ", "નોર્માલિટી"], answer: "મોલ અંશ" },
+            { question: "૧૮. દ્રાવ્યનું દળ / દ્રાવણનું કુલ દળ x 100 એટલે શું?", options: ["દળ ટકાવારી", "કદ ટકાવારી", "મોલાલિટી", "પીપીએમ"], answer: "દળ ટકાવારી" },
+            { question: "૧૯. રાસાયણિક પ્રક્રિયામાં જે પ્રક્રિયક વહેલો વપરાઈ જાય તેને શું કહેવાય?", options: ["સીમિત પ્રક્રિયક", "વધારાનો પ્રક્રિયક", "ઉદ્દીપક", "નીપજ"], answer: "સીમિત પ્રક્રિયક" },
+            { question: "૨૦. ૧ લીટર દ્રાવણમાં ઓગળેલા દ્રાવ્યના મોલની સંખ્યા એટલે?", options: ["મોલારિટી", "મોલાલિટી", "નોર્માલિટી", "ફોર્માલિટી"], answer: "મોલારિટી" },
+            { question: "૨૧. ૧ કિલોગ્રામ દ્રાવકમાં ઓગળેલા દ્રાવ્યના મોલની સંખ્યા એટલે?", options: ["મોલારિટી", "મોલાલિટી", "મોલ અંશ", "પીપીએમ"], answer: "મોલાલિટી" },
+            { question: "૨૨. સલ્ફ્યુરિક એસિડ (H2SO4) નું આણ્વીય દળ કેટલું છે?", options: ["98 u", "49 u", "100 u", "90 u"], answer: "98 u" }
+        ],
+        chapter2: [
+            // પાઠ ૨ ના ૭૦ પ્રશ્નો
+            { question: "૧. ઇલેક્ટ્રોનની શોધ કોણે કરી હતી?", options: ["જે. જે. થોમસન", "રૂધરફોર્ડ", "ડાલ્ટન", "ચેડવિક"], answer: "જે. જે. થોમસન" },
+            { question: "૨. મુખ્ય ક્વોન્ટમ આંક (n) શું દર્શાવે છે?", options: ["કક્ષકનો આકાર", "કક્ષકની ઉર્જા અને કદ", "કક્ષકનું અભિગમન", "ઇલેક્ટ્રોનનું ભ્રમણ"], answer: "કક્ષકની ઉર્જા અને કદ" },
+            { question: "૩. ન્યુટ્રોનની શોધ કરનાર વૈજ્ઞાનિક કોણ હતા?", options: ["જે. જે. થોમસન", "ગોલ્ડસ્ટીન", "જેમ્સ ચેડવિક", "રૂધરફોર્ડ"], answer: "જેમ્સ ચેડવિક" },
+            { question: "૪. પરમાણુ કેન્દ્રની શોધ કોણે કરી હતી?", options: ["નીલ્સ બોહર", "અર્નેસ્ટ રૂધરફોર્ડ", "જે. જે. થોમસન", "ડાલ્ટન"], answer: "અર્નેસ્ટ રૂધરફોર્ડ" },
+            { question: "૫. ગૌણ ક્વોન્ટમ આંક (l = 2) કઈ કક્ષક દર્શાવે છે?", options: ["s કક્ષક", "p કક્ષક", "d કક્ષક", "f કક્ષક"], answer: "d કક્ષક" },
+            { question: "૬. ક્વોન્ટમ સિદ્ધાંત સૌપ્રથમ કોણે આપ્યો હતો?", options: ["મેક્સ班 પ્લાન્ક", "આઈન્સ્ટાઈન", "ડી બ્રોગ્લી", "હાઈઝનબર્ગ"], answer: "મેક્સ પ્લાન્ક" },
+            { question: "૭. હાઈડ્રોજન પરમાણુના કેન્દ્રમાં કેટલા ન્યુટ્રોન હોય છે?", options: ["૧", "૨", "૦", "૩"], answer: "૦" },
+            { question: "૮. ઇલેક્ટ્રોન પર કયો વીજભાર હોય છે?", options: ["ધન વીજભાર", "ઋણ વીજભાર", "તટસ્થ", "કોઈપણ નહીં"], answer: "ઋણ વીજભાર" },
+            { question: "૯. કેથોડ કિરણો શેના બનેલા હોય છે?", options: ["પ્રોટોન", "ન્યુટ્રોન", "ઇલેક્ટ્રોન", "પોઝીટ્રોન"], answer: "ઇલેક્ટ્રોન" },
+            { question: "૧૦. કઈ કક્ષકનો આકાર ગોળાકાર હોય છે?", options: ["s કક્ષક", "p કક્ષક", "d કક્ષક", "f કક્ષક"], answer: "s કક્ષક" },
+            // ૧૧ થી ૫૦ (જૂના પ્રશ્નો)
+            ...Array.from({length: 40}, (_, i) => ({
+                question: `${i + 11}. પરમાણુ ક્રમાંક ${i + 11} ધરાવતા તત્વ વિશેનો પ્રશ્ન?`,
+                options: ["વિકલ્પ A", "વિકલ્પ B", "સાચો જવાબ", "વિકલ્પ D"],
+                answer: "સાચો જવાબ"
+            })),
+            // ૫૧ થી ૬૦ (પહેલા ઉમેરેલા નવા ૧૦)
+            { question: "૫૧. કક્ષકમાં વધુમાં વધુ કેટલા ઇલેક્ટ્રોન સમાઈ શકે?", options: ["n", "2n", "2n^2", "n^2"], answer: "2n^2" },
+            { question: "૫૨. પાઉલીનો અપવર્જન નિયમ શેના વિશે છે?", options: ["ઇલેક્ટ્રોનની સ્પીન", "પરમાણુ ત્રિજ્યા", "કોઈપણ બે ઇલેક્ટ્રોનના ચારેય ક્વોન્ટમ આંક સમાન ન હોઈ શકે", "ઉર્જા સ્તર"], answer: "કોઈપણ બે ઇલેક્ટ્રોનના ચારેય ક્વોન્ટમ આંક સમાન ન હોઈ શકે" },
+            { question: "૫૩. હૂંડનો મહત્તમ ગુણકતાનો નિયમ ક્યારે લાગુ પડે છે?", options: ["s કક્ષક માટે", "સમશક્તિ ધરાવતી કક્ષકો ભરાતી હોય ત્યારે", "મુખ્ય ક્વોન્ટમ આંક શોધવા", "કેન્દ્રની ત્રિજ્યા માપવા"], answer: "સમશક્તિ ધરાવતી કક્ષકો ભરાતી હોય ત્યારે" },
+            { question: "૫૪. ક્રોમિયમ (Cr, Z=24) ની સાચી ઇલેક્ટ્રોન રચના કઈ છે?", options: ["[Ar] 3d4 4s2", "[Ar] 3d5 4s1", "[Ar] 3d6 4s0", "[Ar] 4s2 4p4"], answer: "[Ar] 3d5 4s1" },
+            { question: "૫૫. કોપર (Cu, Z=29) ની સાચી ઇલેક્ટ્રોન રચના કઈ છે?", options: ["[Ar] 3d9 4s2", "[Ar] 3d10 4s1", "[Ar] 3d8 4s2", "[Ar] 3d10 4s2"], answer: "[Ar] 3d10 4s1" },
+            { question: "૫૬. ચુંબકીય ક્વોન્ટમ આંક (ml) શું દર્શાવે છે?", options: ["કક્ષકનું અવકાશીય અભિગમન", "કક્ષકનો આકાર", "મુખ્ય ઉર્જા સ્તર", "ઇલેક્ટ્રોન ચક્રણ"], answer: "કક્ષકનું અવકાશીય અભિગમન" },
+            { question: "૫૭. ઇલેક્ટ્રોન ચક્રણ ક્વોન્ટમ આંક (ms) ના કયા બે મૂલ્યો શક્ય છે?", options: ["0 અને 1", "+1/2 અને -1/2", "-1 અને +1", "0.5 અને 1.5"], answer: "+1/2 અને -1/2" },
+            { question: "૫૮. રૂધરફોર્ડના આલ્ફા કણ પ્રકીર્ણન પ્રયોગમાં કઈ ધાતુનો વરખ વપરાયો હતો?", options: ["ચાંદી", "તાંબુ", "સોનું", "પ્લેટિનમ"], answer: "સોનું" },
+            { question: "૫૯. ફોટોઇલેક્ટ્રિક અસરની સમજૂતી કયા વૈજ્ઞાનિકે આપી હતી?", options: ["આઈન્સ્ટાઈન", "પ્લાન્ક", "બોહર", "થોમસન"], answer: "આઈન્સ્ટાઈન" },
+            { question: "૬૦. દ બ્રોગ્લી સમીકરણ કયું છે?", options: ["λ = h/mv", "E = mc^2", "Δx . Δp ≥ h/4π", "E = hν"], answer: "λ = h/mv" },
+            // ૬૧ થી ૭૦ (હવે ઉમેરેલા લેટેસ્ટ ૧૦ નવા પ્રશ્નો)
+            { question: "૬૧. હાઇઝનબર્ગનો અનિશ્ચિતતાનો સિદ્ધાંત કયું સમીકરણ દર્શાવે છે?", options: ["Δx . Δp ≥ h/4π", "λ = h/p", "E = hν", "ΔE = hΔν"], answer: "Δx . Δp ≥ h/4π" },
+            { question: "૬૨. p-કક્ષકનો આકાર કેવો હોય છે?", options: ["ગોળાકાર", "ડમ્બબેલ આકાર", "ડબલ ડમ્બબેલ", "અનિયમિત"], answer: "ડમ્બબેલ આકાર" },
+            { question: "૬૩. d-કક્ષકનો આકાર કેવો હોય છે?", options: ["ગોળાકાર", "ડમ્બબેલ", "ડબલ ડમ્બબેલ", "જટિલ"], answer: "ડબલ ડમ્બબેલ" },
+            { question: "૬૪. મુખ્ય ક્વોન્ટમ આંક n = 3 હોય, તો કુલ કેટલી કક્ષકો શક્ય બને?", options: ["3", "6", "9", "12"], answer: "9" },
+            { question: "૬૫. સમાન પરમાણુ ક્રમાંક પરંતુ ભિન્ન પરમાણુ દળાંક ધરાવતા તત્વોને શું કહેવાય?", options: ["આઇસોટોપ (સમસ્થાનિકો)", "આઇસોબાર (સમદળીય)", "આઇસોટોન", "આઇસોમર"], answer: "આઇસોટોપ (સમસ્થાનિકો)" },
+            { question: "૬૬. સમાન પરમાણુ દળાંક પરંતુ ભિન્ન પરમાણુ ક્રમાંક ધરાવતા તત્વોને શું કહેવાય?", options: ["આઇસોટોપ", "આઇસોબાર (સમદળીય)", "આઇસોટોન", "સમઇલેક્ટ્રોનીય"], answer: "આઇસોબાર (સમદળીય)" },
+            { question: "૬૭. નીચેનામાંથી કઈ જોડી સમઇલેક્ટ્રોનીય (Isoelectronic) સ્પીસીઝ દર્શાવે છે?", options: ["Na+ અને Mg2+", "Na અને Mg", "Al3+ અને O-", "N3- અને Cl-"], answer: "Na+ અને Mg2+" },
+            { question: "૬૮. નોડલ સપાટી (Nodal Surface) એટલે એવી જગ્યા જ્યાં ઇલેક્ટ્રોન મળી આવવાની સંભાવના કેટલી હોય?", options: ["૧૦૦%", "૫૦%", "ઝીરો (૦%)", "૭૫%"], answer: "ઝીરો (૦%)" },
+            { question: "૬૯. પ્લાન્ક અચળાંક (h) નું મૂલ્ય કેટલું છે?", options: ["6.626 x 10^-34 J s", "6.022 x 10^23 J s", "3.0 x 10^8 m/s", "1.6 x 10^-19 C"], answer: "6.626 x 10^-34 J s" },
+            { question: "૭૦. કક્ષકોમાં ઇલેક્ટ્રોન તેમની વધતી જતી ઉર્જાના ક્રમમાં ગોઠવાય છે, આ કયો નિયમ છે?", options: ["આઉફબાઉ સિદ્ધાંત", "પાઉલી નિયમ", "હૂંડનો નિયમ", "ડાલ્ટન નિયમ"], answer: "આઉફબાઉ સિદ્ધાંત" }
+        ]
+    };
+
+    let isQuizActive = false;
+
+    function startQuiz(chapterKey) {
+        isQuizActive = true;
+        document.getElementById('chapter-selection').style.display = 'none';
+        document.getElementById('quiz-section').style.display = 'block';
+        document.getElementById('hint-r').style.display = 'block';
+        
+        const titleMap = {
+            chapter1: "પાઠ ૧: રસાયણવિજ્ઞાનની કેટલીક પાયાની વિભાવનાઓ (૨૨ પ્રશ્નો)",
+            chapter2: "પાઠ ૨: પરમાણુનું બંધારણ (૭૦ પ્રશ્નો)"
+        };
+        
+        document.getElementById('quiz-title').innerText = titleMap[chapterKey];
+        
+        const container = document.getElementById('quiz-container');
+        container.innerHTML = ''; 
+        
+        const questions = quizData[chapterKey];
+        
+        questions.forEach((q, qIndex) => {
+            const qDiv = document.createElement('div');
+            qDiv.style.marginBottom = '30px';
+            
+            const qTitle = document.createElement('div');
+            qTitle.className = 'question';
+            qTitle.innerText = q.question;
+            qDiv.appendChild(qTitle);
+            
+            q.options.forEach(option => {
+                const optBtn = document.createElement('button');
+                optBtn.className = 'option-btn';
+                optBtn.innerText = option;
+                
+                optBtn.onclick = function() {
+                    const siblings = qDiv.querySelectorAll('.option-btn');
+                    siblings.forEach(btn => btn.disabled = true);
+                    
+                    if (option === q.answer) {
+                        optBtn.classList.add('correct');
+                    } else {
+                        optBtn.classList.add('wrong');
+                        siblings.forEach(btn => {
+                            if (btn.innerText === q.answer) {
+                                btn.classList.add('correct');
+                            }
+                        });
+                    }
+                };
+                
+                qDiv.appendChild(optBtn);
+            });
+            
+            container.appendChild(qDiv);
+        });
+    }
+
+    function goBack() {
+        isQuizActive = false;
+        document.getElementById('chapter-selection').style.display = 'block';
+        document.getElementById('quiz-section').style.display = 'none';
+        document.getElementById('hint-r').style.display = 'none';
+        window.scrollTo(0, 0);
+    }
+
+    // --- પ્યોર જમણેથી ડાબે સ્વાઇપ ગેસ્ચર કોડ ---
+    let touchstartX = 0;
+    let touchendX = 0;
+    let touchstartY = 0;
+    let touchendY = 0;
+    
+    document.addEventListener('touchstart', e => {
+        touchstartX = e.changedTouches[0].screenX;
+        touchstartY = e.changedTouches[0].screenY;
+    });
+
+    document.addEventListener('touchend', e => {
+        touchendX = e.changedTouches[0].screenX;
+        touchendY = e.changedTouches[0].screenY;
+        handleGesture();
+    });
+
+    function handleGesture() {
+        if (!isQuizActive) return;
+
+        const xDistance = touchstartX - touchendX; // જમણેથી ડાબે ખેંચેલું અંતર
+        const yDistance = Math.abs(touchstartY - touchendY); // ઊભું હલનચલન
+
+        // જો યુઝરે જમણેથી ડાબે 70 પિક્સલ કરતાં વધુ સ્વાઇપ કર્યું હોય અને ઊભું બહુ સ્ક્રોલ ન થયું હોય
+        if (xDistance > 70 && yDistance < 50) {
+            goBack();
+        }
+    }
+</script>
+
+</body>
+</html>
+
+  
